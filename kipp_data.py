@@ -245,6 +245,7 @@ def get_mixing_zones(history_paths, kipp_args, xlims = None):
     return Mixing_Zones(zones, mix_types, x_coords, y_coords, histories)
 
 def get_xyz_data(profile_paths, kipp_args, xlims = None):
+    y_data = None
 
     xaxis_divide = kipp_args.xaxis_divide
     if kipp_args.xaxis == "star_age":
@@ -318,8 +319,8 @@ def get_xyz_data(profile_paths, kipp_args, xlims = None):
         except Exception as e:
             print("Couldn't read profile " + profile_name, e)
         x_coord = kipp_args.function_on_xaxis(prof.header[kipp_args.xaxis] / xaxis_divide)
-        if x_coord < max_x_coord:
-            print("Profiles are not increasing in X coordinate!!!")
+       # if x_coord < max_x_coord:
+        #    print("Profiles are not increasing in X coordinate!!!")
         max_x_coord = max(max_x_coord, x_coord)
         min_x_coord = min(min_x_coord, x_coord)
         if kipp_args.yaxis == "mass":
@@ -336,6 +337,8 @@ def get_xyz_data(profile_paths, kipp_args, xlims = None):
         elif kipp_args.yaxis == "radius":
             y_data = prof.get('radius')
         #reverse y_data and z_data for np.interp
+        if y_data is None:
+            raise RuntimeError("y_data was never assigned — check the yaxis or data inputs.")
         y_data = y_data[::-1]
         z_data = kipp_args.extractor(kipp_args.identifier, kipp_args.log10_on_data, prof)
         z_data = z_data[::-1]
